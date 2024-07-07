@@ -18,7 +18,7 @@ case class FinishEditorMessagePlanner(userName: String, allowed:Boolean, overrid
 
     checkTaskExists.flatMap { exists =>
       if (exists) {
-        IO.raiseError(new Exception("No such tasks"))
+        IO.pure("No such tasks")
       } else {
         val passwordIO = readDBString(
           s"SELECT password FROM ${schemaName}.ManagerTasks WHERE user_name = ?",
