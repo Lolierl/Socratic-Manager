@@ -17,7 +17,7 @@ case class FinishEditorMessagePlanner(userName: String, allowed:Boolean, overrid
     )
 
     checkTaskExists.flatMap { exists =>
-      if (exists) {
+      if (!exists) {
         IO.pure("No such tasks")
       } else {
         val passwordIO = readDBString(
