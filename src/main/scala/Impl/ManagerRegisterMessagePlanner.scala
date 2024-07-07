@@ -21,7 +21,7 @@ case class ManagerRegisterMessagePlanner(userName: String, password: String,over
 
       checkUserExists.flatMap { exists =>
         if (exists) {
-          IO.raiseError(new Exception("already registered"))
+          IO.pure("already registered")
         } else {
           val insertUser = writeDB(
             s"INSERT INTO ${schemaName}.user_name (user_name, password, validation) VALUES (?, ?, FALSE)",
