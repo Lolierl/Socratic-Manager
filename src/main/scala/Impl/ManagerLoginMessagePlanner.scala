@@ -36,7 +36,7 @@ case class ManagerLoginMessagePlanner(userName: String, password: String, overri
               List(SqlParameter("String", userName), SqlParameter("String", password))
             ).map { isValid =>
               if (isValid) "Valid user"
-              else "Invalid user"
+              else "Unauthorized"
             }
         }
       }
