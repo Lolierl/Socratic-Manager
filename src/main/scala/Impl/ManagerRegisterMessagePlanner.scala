@@ -24,7 +24,7 @@ case class ManagerRegisterMessagePlanner(userName: String, password: String,over
           IO.pure("already registered")
         } else {
           val insertUser = writeDB(
-            s"INSERT INTO ${schemaName}.user_name (users, password, validation) VALUES (?, ?, FALSE)",
+            s"INSERT INTO ${schemaName}.users (user_name, password, validation) VALUES (?, ?, FALSE)",
             List(SqlParameter("String", userName), SqlParameter("String", password))
           )
           val sendAuthMessage = AuthenManagerMessage(userName).send
