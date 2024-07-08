@@ -23,8 +23,9 @@ case class FinishEditorMessagePlanner(userName: String, allowed:Boolean, overrid
         writeDB(
             s"DELETE FROM ${schemaName}.ManagerTasks WHERE user_name = ?",
             List(SqlParameter("String", userName))
-          )
+          ).flatMap { _ =>
           EditorRequestMessage(userName, allowed).send
+          }
       }
     }
   }

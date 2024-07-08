@@ -14,7 +14,6 @@ import APIs.SuperuserAPI.AuthenManagerMessage
 case class ManagerRegisterMessagePlanner(userName: String, password: String,override val planContext: PlanContext) extends Planner[String]:
   override def plan(using planContext: PlanContext): IO[String] = {
     // Check if the user is already registered
-    startTransaction {
       val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${schemaName}.users WHERE user_name = ?)",
         List(SqlParameter("String", userName))
       )
@@ -31,7 +30,6 @@ case class ManagerRegisterMessagePlanner(userName: String, password: String,over
 
           insertUser *> sendAuthMessage.as("User registered successfully")
         }
-      }
     }
   }
 
