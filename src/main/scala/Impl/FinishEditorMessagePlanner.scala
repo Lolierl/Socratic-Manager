@@ -20,17 +20,11 @@ case class FinishEditorMessagePlanner(userName: String, allowed:Boolean, overrid
       if (!exists) {
         IO.pure("No such tasks")
       } else {
-        val passwordIO = readDBString(
-          s"SELECT password FROM ${schemaName}.ManagerTasks WHERE user_name = ?",
-          List(SqlParameter("String", userName))
-        )
-        passwordIO.flatMap { password =>
-          val deleteTask = writeDB(
+        writeDB(
             s"DELETE FROM ${schemaName}.ManagerTasks WHERE user_name = ?",
             List(SqlParameter("String", userName))
           )
           EditorRequestMessage(userName, allowed).send
-        }
       }
     }
   }
