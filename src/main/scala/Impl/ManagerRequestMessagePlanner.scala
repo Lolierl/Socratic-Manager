@@ -14,12 +14,12 @@ case class ManagerRequestMessagePlanner(userName: String, allowed:Boolean, overr
 
     if (allowed) {
       writeDB(
-        s"UPDATE ${schemaName}.user_name SET validation = TRUE WHERE user_name = ?",
+        s"UPDATE ${schemaName}.users SET validation = TRUE WHERE user_name = ?",
         List(SqlParameter("String", userName))
       ).as("Validation set to True")
     } else {
       writeDB(
-        s"DELETE FROM ${schemaName}.user_name WHERE user_name = ?",
+        s"DELETE FROM ${schemaName}.users WHERE user_name = ?",
         List(SqlParameter("String", userName))
       ).as("User deleted")
     }

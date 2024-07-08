@@ -15,7 +15,7 @@ case class ManagerRegisterMessagePlanner(userName: String, password: String,over
   override def plan(using planContext: PlanContext): IO[String] = {
     // Check if the user is already registered
     startTransaction {
-      val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${schemaName}.user_name WHERE user_name = ?)",
+      val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${schemaName}.users WHERE user_name = ?)",
         List(SqlParameter("String", userName))
       )
 
@@ -24,7 +24,7 @@ case class ManagerRegisterMessagePlanner(userName: String, password: String,over
           IO.pure("already registered")
         } else {
           val insertUser = writeDB(
-            s"INSERT INTO ${schemaName}.user_name (user_name, password, validation) VALUES (?, ?, FALSE)",
+            s"INSERT INTO ${schemaName}.user_name (users, password, validation) VALUES (?, ?, FALSE)",
             List(SqlParameter("String", userName), SqlParameter("String", password))
           )
           val sendAuthMessage = AuthenManagerMessage(userName).send
