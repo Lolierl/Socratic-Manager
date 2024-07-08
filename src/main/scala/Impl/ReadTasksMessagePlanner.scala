@@ -12,7 +12,7 @@ import io.circe.syntax._
 import io.circe.generic.auto._
 import io.circe.parser._
 
-case class ReadTasksPlanner(override val planContext: PlanContext) extends Planner[String]:
+case class ReadTasksMessagePlanner(override val planContext: PlanContext) extends Planner[String]:
   override def plan(using planContext: PlanContext): IO[String] = {
     // Check if the user is already registered
     // Fetch rows from EditorTasks

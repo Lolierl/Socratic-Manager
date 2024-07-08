@@ -15,17 +15,17 @@ object Routes:
   private def executePlan(messageType:String, str: String): IO[String]=
     messageType match {
       case "ManagerRequestMessage" =>
-        IO(decode[ManagerRequestMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for SuperuserLoginMessage")))
+        IO(decode[ManagerRequestMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for ManagerRequestMessage")))
           .flatMap{m=>
             m.fullPlan.map(_.asJson.toString)
           }
       case "ManagerRegisterMessage" =>
-        IO(decode[ManagerRegisterMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for SuperuserLoginMessage")))
+        IO(decode[ManagerRegisterMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for ManagerRegisterMessage")))
           .flatMap{m=>
             m.fullPlan.map(_.asJson.toString)
           }
       case "ManagerLoginMessage" =>
-        IO(decode[ManagerLoginMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for SuperuserLoginMessage")))
+        IO(decode[ManagerLoginMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for ManagerLoginMessage")))
           .flatMap{m=>
             m.fullPlan.map(_.asJson.toString)
           }
@@ -34,8 +34,8 @@ object Routes:
           .flatMap{m=>
             m.fullPlan.map(_.asJson.toString)
           }
-      case "ReadTasks" =>
-        IO(decode[ReadTasksPlanner](str).getOrElse(throw new Exception("Invalid JSON for ReadTasks")))
+      case "ReadTasksMessage" =>
+        IO(decode[ReadTasksMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for ReadTasksMessage")))
           .flatMap{m=>
             m.fullPlan.map(_.asJson.toString)
           }
