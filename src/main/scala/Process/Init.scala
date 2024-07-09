@@ -18,6 +18,7 @@ object Init {
       _ <- initSchema(schemaName)
       _ <- writeDB(s"CREATE TABLE IF NOT EXISTS ${schemaName}.users (user_name TEXT, password TEXT, validation BOOLEAN)", List())
       _ <- writeDB(s"CREATE TABLE IF NOT EXISTS ${schemaName}.EditorTasks (user_name TEXT)", List())
+      _ <- writeDB(s"CREATE TABLE IF NOT EXISTS ${schemaName}.periodicals (periodical TEXT)", List())
     } yield ()
 
 }
