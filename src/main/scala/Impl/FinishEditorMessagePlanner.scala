@@ -12,7 +12,7 @@ import io.circe.generic.auto.*
 case class FinishEditorMessagePlanner(userName: String, allowed:Boolean, override val planContext: PlanContext) extends Planner[String]:
   override def plan(using planContext: PlanContext): IO[String] = {
     // Check if the user is already registered
-    val checkTaskExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${schemaName}.ManagerTasks WHERE user_name = ?)",
+    val checkTaskExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${schemaName}.EditorTasks WHERE user_name = ?)",
       List(SqlParameter("String", userName))
     )
 
@@ -21,7 +21,7 @@ case class FinishEditorMessagePlanner(userName: String, allowed:Boolean, overrid
         IO.pure("No such tasks")
       } else {
         writeDB(
-            s"DELETE FROM ${schemaName}.ManagerTasks WHERE user_name = ?",
+            s"DELETE FROM ${schemaName}.EditorTasks WHERE user_name = ?",
             List(SqlParameter("String", userName))
           ).flatMap { _ =>
           EditorRequestMessage(userName, allowed).send
