@@ -27,14 +27,24 @@ case class ManagerRequestMessagePlanner(userName: String, allowed:Boolean, overr
           s"SELECT salt FROM ${schemaName}.key_buffer WHERE user_name = ?",
           List(SqlParameter("String", userName))
         )
+        _ <- writeDB(
+          s"DELETE FROM ${schemaName}.key_buffer WHERE user_name = ?",
+          List(SqlParameter("String", userName))
+        )
         result <- RegisterMessage(userName, passwordHash, salt, "manager").send
       } yield result
 
     } else {
-      writeDB(
-        s"DELETE FROM ${schemaName}.users WHERE user_name = ?",
-        List(SqlParameter("String", userName))
-      )
+      for {
+        _ <- writeDB(
+          s"DELETE FROM ${schemaName}.key_buffer WHERE user_name = ?",
+          List(SqlParameter("String", userName))
+        )
+        _ <- writeDB(
+          s"DELETE FROM ${schemaName}.users WHERE user_name = ?",
+          List(SqlParameter("String", userName))
+        )
+      } yield ""
     }
   }
 
