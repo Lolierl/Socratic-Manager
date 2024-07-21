@@ -10,25 +10,33 @@ import APIs.PatientAPI.PatientQueryMessage
 import cats.effect.IO
 import io.circe.generic.auto.*
 import APIs.SuperuserAPI.AuthenManagerMessage
+import APIs.UserManagementAPI.CheckUserExistsMessage
+import Shared.PasswordHasher.hashPassword
 
 case class ManagerRegisterMessagePlanner(userName: String, password: String,override val planContext: PlanContext) extends Planner[String]:
   override def plan(using planContext: PlanContext): IO[String] = {
     // Check if the user is already registered
-      val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${schemaName}.users WHERE user_name = ?)",
-        List(SqlParameter("String", userName))
-      )
+      val checkUserExists = CheckUserExistsMessage(userName).send
 
       checkUserExists.flatMap { exists =>
         if (exists) {
           IO.pure("already registered")
         } else {
-          val insertUser = writeDB(
-            s"INSERT INTO ${schemaName}.users (user_name, password, validation) VALUES (?, ?, FALSE)",
-            List(SqlParameter("String", userName), SqlParameter("String", password))
-          )
-          val sendAuthMessage = AuthenManagerMessage(userName).send
-
-          insertUser *> sendAuthMessage.as("User registered successfully")
+          val (passwordHash, salt) = hashPassword(password)
+          for {
+            _ <- writeDB(
+              s"INSERT INTO ${schemaName}.key_buffer (user_name, password_hash, salt) VALUES (?, ?, ?)",
+              List(
+                SqlParameter("String", userName),
+                SqlParameter("String", passwordHash),
+                SqlParameter("String", salt)
+              ))
+            _ <- writeDB(
+              s"INSERT INTO ${schemaName}.users (user_name, validation) VALUES (?, FALSE)",
+              List(SqlParameter("String", userName))
+            )
+            _ <- AuthenManagerMessage(userName).send
+          } yield "User registered successfully"
         }
     }
   }

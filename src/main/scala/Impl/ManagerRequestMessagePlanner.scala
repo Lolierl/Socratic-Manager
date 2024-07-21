@@ -14,25 +14,28 @@ case class ManagerRequestMessagePlanner(userName: String, allowed:Boolean, overr
   override def plan(using planContext: PlanContext): IO[String] = {
 
     if (allowed) {
-      writeDB(
-        s"UPDATE ${schemaName}.users SET validation = TRUE WHERE user_name = ?",
-        List(SqlParameter("String", userName))
-      ).flatMap { _ =>
-        readDBString(
-          s"SELECT password FROM ${schemaName}.users WHERE user_name = ?",
+      for {
+        _ <- writeDB(
+          s"UPDATE ${schemaName}.users SET validation = TRUE WHERE user_name = ?",
           List(SqlParameter("String", userName))
-        ).flatMap { password =>
-          RegisterMessage(userName, password, "manager").send
+        )
+        passwordHash <- readDBString(
+          s"SELECT password_hash FROM ${schemaName}.key_buffer WHERE user_name = ?",
+          List(SqlParameter("String", userName))
+        )
+        salt <- readDBString(
+          s"SELECT salt FROM ${schemaName}.key_buffer WHERE user_name = ?",
+          List(SqlParameter("String", userName))
+        )
+        result <- RegisterMessage(userName, passwordHash, salt, "manager").send
+      } yield result
 
-        }
-      }
-    }else {
+    } else {
       writeDB(
         s"DELETE FROM ${schemaName}.users WHERE user_name = ?",
         List(SqlParameter("String", userName))
       )
-      }
-    
+    }
   }
 
  
